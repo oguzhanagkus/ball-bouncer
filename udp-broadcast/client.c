@@ -24,7 +24,7 @@
 #include <arpa/inet.h>
 
 #define TIMEOUT 10 // Timeout value in seconds, waits for server information until timeout
-#define BROADCAST_PORT 9000	// Broadcast port
+#define BROADCAST_PORT 9000 // Broadcast port
 #define BROADCAST_IP "255.255.255.255" // Broadcast IP
 
 const char client_key[16] = "6Unz2hcxQVTs2dq\0"; // A random private key which declare the broadcast come from our clients
@@ -123,5 +123,5 @@ int discover_server(struct sockaddr_in *server_address) {
 void signal_handler(int signal) {
 	printf("\n%s signal received.\n", sys_siglist[signal]);
 	close(socket_fd);
-  exit(0);
+	exit(0);
 }

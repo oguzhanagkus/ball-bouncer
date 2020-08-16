@@ -27,8 +27,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define BROADCAST_PORT 9000	// Broadcast port
-#define TCP_PORT 9005	// TCP port
+#define BROADCAST_PORT 9000 // Broadcast port
+#define TCP_PORT 9005 // TCP port
 
 const char client_key[16] = "6Unz2hcxQVTs2dq\0"; // A random private key which declare the broadcast come from our clients
 const char server_key[16] = "R8Jb2f55EZDAmJ7\0"; // A random private key which declare the reply come from the server
@@ -110,5 +110,5 @@ void signal_handler(int signal) {
 	stop = 1;
 	printf("\n%s signal received.\n", sys_siglist[signal]);
 	close(socket_fd);
-  exit(0);
+	exit(0);
 }
