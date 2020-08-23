@@ -1,0 +1,281 @@
+#include <iostream>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <stdio.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <fcntl.h> // File control
+#include <termios.h> // POSIX terminal control
+#include <unistd.h> // UNIX standard
+#include <errno.h> // Error number
+#include "pid.hpp"
+
+using namespace cv;
+using namespace std;
+
+struct command {
+  uint8_t angle_0 = 0;
+  uint8_t angle_1 = 0;
+  uint8_t angle_2 = 0;
+  uint8_t angle_3 = 0;
+};
+
+
+/*Midpoint coordinates*/
+#define CENTER_X 320.0
+#define CENTER_Y 240.0
+
+struct Angles{
+    int motor1 = 0;    /*Left Motor*/
+    int motor2 = 0;    /*Righ Motor*/
+    int motor3 = 0;    /*Upper Motor*/
+    int motor4 = 0;    /*Lower Motor*/
+};
+
+
+void balanceBall(double ball_x, double ball_y,double x,double y,struct Angles *a);
+void getCenter(double ball_x,double ball_y,struct Angles *a);
+
+using namespace std;
+
+int main(int argc, char** argv)
+{
+	// Capture the video from Integrated Webcam
+	//VideoCapture cap("http://192.168.43.31:4747/mjpegfeed?640x480");
+	VideoCapture cap(3);
+	struct Angles *a=(struct Angles*)malloc(sizeof(struct Angles));
+
+	a->motor1=0;
+	a->motor2=0;
+	a->motor3=0;
+	a->motor4=0;
+
+    //printf("%.4f - %.4f - %.4f - %.4f",a->motor1,a->motor2,a->motor3,a->motor4);
+
+
+	/* ---------- Opening serial port and configration ---------- */
+
+	  char port_name[] = "/dev/ttyACM0"; // Port name that board connected.
+	  int port = open(port_name, O_RDWR | O_NOCTTY | O_NDELAY); // File descriptor
+
+	  if(port == -1) // Error checking
+	    printf("Error in opening ttyACM0.\n");
+	  else
+	    printf("ttyACM1 opened.\n\n");
+
+	  struct termios SerialPortSettings; // Structure
+
+	  tcgetattr(port, &SerialPortSettings); // Current attributes of port
+	  cfsetispeed(&SerialPortSettings, B57600); // Baudrate 57600
+	  cfsetospeed(&SerialPortSettings, B57600); // Baudrate 57600
+
+	  SerialPortSettings.c_cflag &= ~PARENB; // Disable parity
+	  SerialPortSettings.c_cflag &= ~CSTOPB; // Stop bit
+	  SerialPortSettings.c_cflag &= ~CSIZE; // Clears the mask for data size
+	  SerialPortSettings.c_cflag |=  CS8; // Data bits = 8
+	  SerialPortSettings.c_cflag &= ~CRTSCTS; // No hardware flow control
+	  SerialPortSettings.c_cflag |= CREAD | CLOCAL; // Enable reciever
+	  SerialPortSettings.c_iflag &= ~(IXON | IXOFF | IXANY); // Disable flow control
+	  SerialPortSettings.c_iflag &= ~(ICANON | ECHO | ECHOE | ISIG); // Non connonical mode
+	  SerialPortSettings.c_oflag &= ~OPOST; // No output processing
+	  SerialPortSettings.c_cc[VMIN] = 5; // Read at least 5 character
+	  SerialPortSettings.c_cc[VTIME] = 0; // Wait indefinetly
+	  if((tcsetattr(port, TCSANOW, &SerialPortSettings)) != 0) // Set the attributes
+	  {
+	    printf("Error in setting attributes.\n");
+	    return -1;
+	  }
+
+	// If not success, exit program
+	if (!cap.isOpened())
+	{
+		cout << "Cannot open the web cam" << endl;
+		return -1;
+	}
+
+	// Create a Control Window and Trackbars
+	// namedWindow("Control", CV_WINDOW_AUTOSIZE);		// Control Window
+	namedWindow("Control");		// Control Window
+
+	int iLowH = 0;
+	int iHighH = 21;
+
+	int iLowS = 30;
+	int iHighS = 255;
+
+	int iLowV = 200;
+	int iHighV = 255;
+
+	// Create Trackbars in Control Window
+	createTrackbar("LowH", "Control", &iLowH, 179);		//Hue (0 - 179)
+	createTrackbar("HighH", "Control", &iHighH, 179);
+
+	createTrackbar("LowS", "Control", &iLowS, 255);		//Saturation (0 - 255)
+	createTrackbar("HighS", "Control", &iHighS, 255);
+
+	createTrackbar("LowV", "Control", &iLowV, 255);		//Value (0 - 255)
+	createTrackbar("HighV", "Control", &iHighV, 255);
+
+	//// Capture a Temporary Image from the camera
+	//Mat imgTmp;
+	//cap.read(imgTmp);
+	//// Create a Black Image with the size as the camera output
+	//Mat imgLines = Mat::zeros(imgTmp.size(), CV_8UC3);;
+	int index = 0;
+
+	/* Init pid objects*/
+	PID pidServoX( "pidServoX_config" );
+	if ( pidServoX.fail() )
+	{
+			cerr << pidServoX.getErrorStr() << endl;
+			exit( EXIT_FAILURE );
+	}
+	PID pidServoY( "pidServoX_config" );
+	if ( pidServoY.fail() )
+	{
+			cerr << pidServoY.getErrorStr() << endl;
+			exit( EXIT_FAILURE );
+	}
+
+	while (true)
+	{
+		Mat imgOriginal;
+		bool blnFrameReadSuccessfully = cap.read(imgOriginal);
+
+		if (!blnFrameReadSuccessfully || imgOriginal.empty()) {				// if frame read unsuccessfully
+			std::cout << "error: frame can't read \n";						// print error message
+			break;															// jump out of loop
+		}
+
+		// Convert the captured frame from BGR to HSV
+		Mat imgHSV;
+		cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV);
+
+		// Create the Thresholded Image
+		Mat imgThresholded;
+		inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded);
+
+		// Noise Reduction using Mathematical Morphology
+		// Morphological Opening (Removes small objects from the foreground)
+		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+		// Morphological Closing (Removes small holes from the foreground)
+		dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+		erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));
+
+		// Calculate the Moments of the Thresholded Image
+		Moments oMoments = moments(imgThresholded);
+
+		double dM01 = oMoments.m01;
+		double dM10 = oMoments.m10;
+		double dArea = oMoments.m00;
+
+		
+		/* Init pid objects end */
+
+
+		// If the area <= 10000, consider that it's because of the noise
+		if (dArea > 100000)
+		{	
+			// Calculate the Centroid of the Object
+			int posX = dM10 / dArea;
+			int posY = dM01 / dArea;
+			int R = sqrt((dArea / 255) / 3.14);
+
+			int realR = 4;
+			int f = -10;
+			int fpx = 750;
+			int d = (realR*fpx) / R + f;
+
+			double area = R*R*M_PI;
+			a->motor1 = 0;
+			a->motor2 = 0;
+			a->motor3 = 0;
+			a->motor4 = 0;
+			
+			double distance = 6*pow(10,-9)*pow(area,2) - 0.0006*area + 22.005 ;
+    		
+			/* Selman Start*/
+			cout << "errorX: " << CENTER_X - posX << endl;
+			cout << "errorY: " << CENTER_Y - posY << endl;
+
+    		//getCenter(posX,posY,a);
+			pidServoX.compute( CENTER_X - posX );
+			pidServoY.compute( CENTER_Y - posY );
+
+			cout << "signalX: " << pidServoX.getOutput() << endl;
+			cout << "signalY: " << pidServoY.getOutput() << endl;
+
+			//a->motor1 = - pidServoX.getOutput();
+			if (pidServoY.getOutput() < 0)
+				a->motor4 = - pidServoY.getOutput();
+			else
+				a->motor2 = pidServoY.getOutput();
+
+			if (pidServoX.getOutput() < 0)
+				a->motor1 = - pidServoX.getOutput();
+			else
+				a->motor3 = pidServoX.getOutput();
+
+    		printf("%d - %d - %d - %d ----\n",a->motor1,a->motor2,a->motor3,a->motor4);
+
+			/* Selman End */
+	   		struct command temp;
+			char buffer[5];
+
+			buffer[4] = '\0';
+
+			temp.angle_0 = (uint8_t)a->motor1+5;
+			temp.angle_1 = (uint8_t)a->motor2;
+			temp.angle_2 = (uint8_t)a->motor3;
+			temp.angle_3 = (uint8_t)a->motor4+10;
+
+
+			//if (temp.angle_0 == 0)
+			//break;
+			if (index % 1 == 0)
+    		{		
+				write(port, &temp, sizeof(temp));
+				tcflush(port, TCIFLUSH);
+    		}
+		
+			if (posX >= 0 && posY >= 0)
+			{
+				std::cout << "Ball position X = "<< posX			
+				<<",\tY = "<< posY								
+				<<",\tRadius = "<< R
+				<<",\tArea = "<< area
+				<<",\tDistance = "<< distance <<"\n";	
+				circle(imgOriginal, Point(posX, posY), R, Scalar(0, 0, 255), 2);
+			}
+
+		}
+
+		cv::namedWindow("Original", 0);
+		cv::namedWindow("Thresholded Image", 0);
+
+		cv::resizeWindow("Original",500,500);
+		cv::resizeWindow("Thresholded Image",500,500);
+
+		// Show the Thresholded Image
+		imshow("Thresholded Image", imgThresholded);
+
+		// Show the Tracked Image
+		// imgOriginal = imgOriginal + imgLines;
+		imshow("Original", imgOriginal);
+
+		// Wait for key is pressed then break loop
+		if (waitKey(5) == 27)			//ESC 27, ENTER 13, SPACE 32
+		{
+			break;
+		}
+	}
+	free(a);
+	close(port);
+	printf("\nttyACM1 closed.\n");
+
+	return 0;
+}
+
