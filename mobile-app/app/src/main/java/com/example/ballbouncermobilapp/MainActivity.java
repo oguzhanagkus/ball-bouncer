@@ -18,6 +18,8 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
        /* customDialog = new CustomDialog();
         customDialog.show(getSupportFragmentManager(),"connection custom"); */
 
-        new UdpUnicastClient();
+    //    new UdpUnicastClient();
 
-        new myTask().execute(5,30);
+        new myTask().execute(5555);
     }
 
     private class myTask extends AsyncTask<Integer, DataFromServer, Boolean> {
@@ -63,7 +65,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+            try {
+                c= new DatagramSocket(5555);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+            try {
+                c.setBroadcast(true);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
 
             dfs = new DataFromServer();
             positionText= findViewById(R.id.positionText);
@@ -85,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         protected Boolean doInBackground(Integer... integers) {
            //data oku....
             while (true) {
-               // System.out.println("Starting T2");
+                System.out.println("Starting T2");
 
                 try {
                     byte[] recvBufx = new byte[15000];
@@ -93,13 +104,13 @@ public class MainActivity extends AppCompatActivity {
                     c.receive(receivePacketx);
 
                     String x = new String(receivePacketx.getData());
-                 //   System.out.println("x = " + x);
+                    System.out.println("x = " + x);
                     String position[] = x.split("-");
                     if(position.length < 4 )
                         continue;
 
                     dfs.generalSetter(Double.parseDouble(position[0]), Double.parseDouble(position[1]), Double.parseDouble(position[2]));
-                 //   System.out.println("dfs = " + dfs.getX());
+                    System.out.println("dfs = " + dfs.getX());
 
                     publishProgress(dfs);
                     Thread.sleep(100);

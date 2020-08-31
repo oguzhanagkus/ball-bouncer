@@ -91,12 +91,12 @@ public class UdpUnicastClient {
 
                 //Check if the message is correct
                 String message = new String(receivePacket.getData()).trim();
-                if (message.equals("R8Jb2f55EZDAmJ7")) {
+              /*  if (message.equals("R8Jb2f55EZDAmJ7")) {
                     MainActivity.serverIp = receivePacket.getAddress().getHostAddress();
                     //System.out.println("EŞLEŞTİ >>>>");
 
                     return true;
-                }
+                } */
 
                 //Close the port!
             } catch (IOException  ex) {
