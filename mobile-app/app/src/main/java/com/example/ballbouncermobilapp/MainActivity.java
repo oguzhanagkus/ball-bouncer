@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
             super.onProgressUpdate(values);
 
 
-
             xyCurrentSeries = new PointsGraphSeries<>();
             xyPreviousSeries = new PointsGraphSeries<>();
             xhCurrentSeries = new PointsGraphSeries<>();
@@ -144,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
             String y = String.format(Locale.US, "%.2f", values[0].getY());
             String h = String.format(Locale.US, "%.2f", values[0].getZ());
 
-            heightText.setText("Height: " + Integer.valueOf(h));
-            positionText.setText("Coordinates: (" + Integer.valueOf(x) + ", " + Integer.valueOf(y) + " )");
+            heightText.setText("Height: " + h);
+            positionText.setText("Coordinates: (" + x + ", " + y + " )");
 
             System.out.println("---------------");
             xyPreviousSeries.appendData(new DataPoint(values[0].get_x(),values[0].get_y()),true,1000);
