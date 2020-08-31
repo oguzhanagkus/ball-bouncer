@@ -10,6 +10,7 @@
         android:id="@+id/infoLinerLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,6 +21,10 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             app:srcCompat="@drawable/green" />
+
+        <Space
+            android:layout_width="3dp"
+            android:layout_height="0dp" />
 
         <TextView
             android:id="@+id/currentText"
@@ -39,6 +44,10 @@
             android:layout_height="20dp"
             app:srcCompat="@drawable/yellow" />
 
+        <Space
+            android:layout_width="3dp"
+            android:layout_height="0dp" />
+
         <TextView
             android:id="@+id/previousText"
             android:layout_width="wrap_content"
@@ -52,7 +61,7 @@
         android:id="@+id/allLinerLayout"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/infoLinerLayout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,6 +73,10 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             app:srcCompat="@drawable/height" />
+
+        <Space
+            android:layout_width="3dp"
+            android:layout_height="0dp" />
 
         <TextView
             android:id="@+id/heightText"
@@ -84,6 +97,10 @@
             android:layout_height="20dp"
             app:srcCompat="@drawable/position" />
 
+        <Space
+            android:layout_width="3dp"
+            android:layout_height="0dp" />
+
         <TextView
             android:id="@+id/positionText"
             android:layout_width="wrap_content"
@@ -99,9 +116,11 @@
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="220dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/allLinerLayout">
+        app:layout_constraintBottom_toTopOf="@+id/allLinerLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.jjoe64.graphview.GraphView
             android:id="@+id/xyPlot"

@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public static DatagramSocket c;
     public static String serverIp;
     DataFromServer dfs;
-    public static CustomDialog customDialog;
+    //public static CustomDialog customDialog;
 
 
 
@@ -37,11 +37,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        customDialog = new CustomDialog();
-        customDialog.show(getSupportFragmentManager(),"connection custom");
+       /* customDialog = new CustomDialog();
+        customDialog.show(getSupportFragmentManager(),"connection custom"); */
 
         new UdpUnicastClient();
-        System.out.println("maloooooooo");
+
         new myTask().execute(5,30);
     }
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            System.out.println("pre pre pre");
+
 
             dfs = new DataFromServer();
             positionText= findViewById(R.id.positionText);
@@ -84,11 +84,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Integer... integers) {
            //data oku....
-//            customDialog.onDestroy();
-
-
             while (true) {
-                System.out.println("Starting T2");
+               // System.out.println("Starting T2");
 
                 try {
                     byte[] recvBufx = new byte[15000];
@@ -96,13 +93,13 @@ public class MainActivity extends AppCompatActivity {
                     c.receive(receivePacketx);
 
                     String x = new String(receivePacketx.getData());
-                    System.out.println("x = " + x);
+                 //   System.out.println("x = " + x);
                     String position[] = x.split("-");
                     if(position.length < 4 )
                         continue;
 
                     dfs.generalSetter(Double.parseDouble(position[0]), Double.parseDouble(position[1]), Double.parseDouble(position[2]));
-                    System.out.println("dfs = " + dfs.getX());
+                 //   System.out.println("dfs = " + dfs.getX());
 
                     publishProgress(dfs);
                     Thread.sleep(100);
@@ -163,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         public void setXHProperties() {
 
             GraphView xhPlotView = (GraphView) findViewById(R.id.xhPlot);
-            xhPlotView.setTitle("X-H Coordinates");
+            xhPlotView.setTitle("X-Z Coordinates");
             xhPlotView.setTitleColor(Color.WHITE);
             //set color
             xhPlotView.getGridLabelRenderer().setGridColor(Color.WHITE);
@@ -183,12 +180,12 @@ public class MainActivity extends AppCompatActivity {
 
             //set manuel x bounds
             xhPlotView.getViewport().setXAxisBoundsManual(true);
-            xhPlotView.getViewport().setMaxX(30);
+            xhPlotView.getViewport().setMaxX(20);
             xhPlotView.getViewport().setMinX(0);
 
             //set manuel y bounds
             xhPlotView.getViewport().setYAxisBoundsManual(true);
-            xhPlotView.getViewport().setMaxY(30);
+            xhPlotView.getViewport().setMaxY(20);
             xhPlotView.getViewport().setMinY(0);
         }
 
@@ -220,12 +217,12 @@ public class MainActivity extends AppCompatActivity {
 
             //set manuel x bounds
             xyPlotView.getViewport().setXAxisBoundsManual(true);
-            xyPlotView.getViewport().setMaxX(30);
+            xyPlotView.getViewport().setMaxX(20);
             xyPlotView.getViewport().setMinX(0);
 
             //set manuel y bounds
             xyPlotView.getViewport().setYAxisBoundsManual(true);
-            xyPlotView.getViewport().setMaxY(30);
+            xyPlotView.getViewport().setMaxY(20);
             xyPlotView.getViewport().setMinY(0);
         }
     }
