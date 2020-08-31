@@ -144,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
             String y = String.format(Locale.US, "%.2f", values[0].getY());
             String h = String.format(Locale.US, "%.2f", values[0].getZ());
 
-            heightText.setText("Height: " + h);
-            positionText.setText("Position: (" + x + ", " + y + " )");
+            heightText.setText("Height: " + Integer.valueOf(h));
+            positionText.setText("Coordinates: (" + Integer.valueOf(x) + ", " + Integer.valueOf(y) + " )");
 
             System.out.println("---------------");
             xyPreviousSeries.appendData(new DataPoint(values[0].get_x(),values[0].get_y()),true,1000);
@@ -191,12 +191,12 @@ public class MainActivity extends AppCompatActivity {
 
             //set manuel x bounds
             xhPlotView.getViewport().setXAxisBoundsManual(true);
-            xhPlotView.getViewport().setMaxX(480);
+            xhPlotView.getViewport().setMaxX(500);
             xhPlotView.getViewport().setMinX(0);
 
             //set manuel y bounds
             xhPlotView.getViewport().setYAxisBoundsManual(true);
-            xhPlotView.getViewport().setMaxY(70);
+            xhPlotView.getViewport().setMaxY(100);
             xhPlotView.getViewport().setMinY(0);
         }
 
@@ -228,12 +228,12 @@ public class MainActivity extends AppCompatActivity {
 
             //set manuel x bounds
             xyPlotView.getViewport().setXAxisBoundsManual(true);
-            xyPlotView.getViewport().setMaxX(480);
+            xyPlotView.getViewport().setMaxX(500);
             xyPlotView.getViewport().setMinX(0);
 
             //set manuel y bounds
             xyPlotView.getViewport().setYAxisBoundsManual(true);
-            xyPlotView.getViewport().setMaxY(640);
+            xyPlotView.getViewport().setMaxY(700);
             xyPlotView.getViewport().setMinY(0);
         }
     }
