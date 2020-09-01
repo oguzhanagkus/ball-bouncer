@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                     if(position.length < 4 )
                         continue;
 
-                    dfs.generalSetter(Double.parseDouble(position[0]), Double.parseDouble(position[1]), Double.parseDouble(position[2]));
+                    dfs.generalSetter(Integer.parseInt(position[0]), Integer.parseInt(position[1]), Integer.parseInt(position[2]));
                     System.out.println("dfs = " + dfs.getX());
 
                     publishProgress(dfs);
@@ -139,9 +139,9 @@ public class MainActivity extends AppCompatActivity {
             setXYProperties();
             setXHProperties();
 
-            String x = String.format(Locale.US, "%.2f", values[0].getX());
-            String y = String.format(Locale.US, "%.2f", values[0].getY());
-            String h = String.format(Locale.US, "%.2f", values[0].getZ());
+            String x = String.valueOf(values[0].getX());
+            String y = String.valueOf(values[0].getY());
+            String h = String.valueOf(values[0].getZ());
 
             heightText.setText("Height: " + h);
             positionText.setText("Coordinates: (" + x + ", " + y + " )");
