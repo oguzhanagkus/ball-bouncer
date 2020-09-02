@@ -113,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println("dfs = " + dfs.getX());
 
                     publishProgress(dfs);
-                    Thread.sleep(100);
-                } catch (IOException | InterruptedException e) {
+
+                } catch (IOException e) {
                     System.out.println("e.getMessage() = " + e.getMessage());
                 }
                 xyPlotView.removeAllSeries();

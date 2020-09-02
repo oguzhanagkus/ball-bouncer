@@ -32,11 +32,7 @@ public class UdpUnicastClient {
 
         @Override
         protected Boolean doInBackground(Integer... integers) {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
             int port = integers[0];
 
             // Find the server using UDP broadcast
