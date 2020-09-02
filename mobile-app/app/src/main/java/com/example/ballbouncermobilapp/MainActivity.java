@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
             //set manuel x bounds
             xhPlotView.getViewport().setXAxisBoundsManual(true);
-            xhPlotView.getViewport().setMaxX(500);
+            xhPlotView.getViewport().setMaxX(700);
             xhPlotView.getViewport().setMinX(0);
 
             //set manuel y bounds
@@ -227,12 +227,12 @@ public class MainActivity extends AppCompatActivity {
 
             //set manuel x bounds
             xyPlotView.getViewport().setXAxisBoundsManual(true);
-            xyPlotView.getViewport().setMaxX(500);
+            xyPlotView.getViewport().setMaxX(700);
             xyPlotView.getViewport().setMinX(0);
 
             //set manuel y bounds
             xyPlotView.getViewport().setYAxisBoundsManual(true);
-            xyPlotView.getViewport().setMaxY(700);
+            xyPlotView.getViewport().setMaxY(500);
             xyPlotView.getViewport().setMinY(0);
         }
     }
