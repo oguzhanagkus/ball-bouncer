@@ -27,7 +27,6 @@ public class UdpUnicastClient {
         protected void onPreExecute() {
             super.onPreExecute();
 
-
         }
 
         @Override

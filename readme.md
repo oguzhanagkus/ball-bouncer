@@ -21,7 +21,7 @@
 
 ##### Server app includes:
 - Image processing (with OpenCV)
-  - Detect the ball's coordinates and height from plate
+  - Detect the ball's coordinates and height from the plate
 - PID controller
   - Calculates angles for servo motors
 - Serial port handler
