@@ -1,12 +1,6 @@
-# Gebze Technical University
-# Computer Engineering Department
-# CSE396 Computer Engineering Project Course
+# Gebze Technical University<br/>Computer Engineering Department<br/>CSE396 Computer Engineering Project Course Project
 
-## Repository of Group 11
-
-### Consultant: Prof. Dr. Erkan Zergeroğlu
-
-### Group Members:
+### Members of Group #11:
 - Abdulhakim Emre Artış
 - Cihan Can Ayyıldız
 - Esra Emirli
