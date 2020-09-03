@@ -1,4 +1,4 @@
-# Gebze Technical University<br/>Computer Engineering Department<br/>CSE396 Computer Engineering Project Course Project
+# Gebze Technical University<br/>Computer Engineering Department<br/>CSE396 Computer Engineering Project Course
 
 ### Members of Group #11:
 - Abdulhakim Emre Artış
@@ -13,7 +13,7 @@
 - Selman Özleyen
 - Yusuf Can Kan
 
-#### We have 3 applications/modules:
+#### We have 4 applications/modules:
 - Server app
 - Client app
 - Mobile app
@@ -57,4 +57,4 @@
 - The server and client applications are compatible with both Linux and Windows because we have developed on QT Platform
 - The mobile applications for only Android systems
 - The project's video on YouTube:
-- The detailed report is added to repository
+- The detailed report added to repository
