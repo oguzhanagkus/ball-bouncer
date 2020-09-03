@@ -56,5 +56,5 @@
 - The server and client/mobile applications should be in same local network
 - The server and client applications are compatible with both Linux and Windows because we have developed on QT Platform
 - The mobile applications for only Android systems
-- The project's video on YouTube:
+- The project video on YouTube: https://youtu.be/woOF_tPZMPY
 - The detailed report added to repository
