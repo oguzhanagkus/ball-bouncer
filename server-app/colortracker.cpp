@@ -5,6 +5,8 @@
 #define CENTER_Y 240.0
 #define NUMBERPOINT 4
 #define DURATIONPERIOD 400
+#define MOTOR_0_OFFSET 10
+#define JUMP 30
 
 int cornerCenterX[NUMBERPOINT] = {320, 430, 310, 175};
 int cornerCenterY[NUMBERPOINT] = {375, 240, 80, 240};
@@ -22,8 +24,9 @@ colorTracker::colorTracker(QObject *parent, int cameraIndex) : QThread {parent} 
 
 void colorTracker::run()
 {
+    qDebug() << "burasiKadikoy";
     mVideoCap = VideoCapture(cameraIndex);
-
+    qDebug() << "ssdfsd";
     if (!mVideoCap.isOpened())
     {
         cout << "Webcam cannot opened!\n";
@@ -41,6 +44,7 @@ void colorTracker::run()
     double dM01, dM10, dArea;
     bool blnFrameReadSuccessfully;
     auto start = high_resolution_clock::now();
+    int even = 0;
 
     /* -------------------- */
 
@@ -62,23 +66,11 @@ void colorTracker::run()
     lastSecond = 0;
 
     /* -------------------- */
-
-    PID *pidServoX = new PID("./pid/pidServoX_config");
-    if (pidServoX->fail())
-    {
-        cerr << pidServoX->getErrorStr() << endl;
-        exit( EXIT_FAILURE );
-    }
-
-    PID *pidServoY = new PID("./pid/pidServoY_config");
-    if (pidServoY->fail())
-    {
-        cerr << pidServoY->getErrorStr() << endl;
-        exit( EXIT_FAILURE );
-    }
+    // TODO Memory leak
+    PID *pidServoX = nullptr;
+    PID *pidServoY = nullptr;
 
     /* -------------------- */
-
     while (true)
     {
         mVideoCap >> mframe;
@@ -98,7 +90,7 @@ void colorTracker::run()
 
         if (!blnFrameReadSuccessfully || imgOriginal.empty())
         {
-            cout << "Frame cannor read!\n";
+            cout << "Frame cannot read!\n";
             break;
         }
 
@@ -158,13 +150,36 @@ void colorTracker::run()
 
             if (flag == 0)  // Stop button clicked
             {
-                command.angle_0 = 5;
+                command.angle_0 = MOTOR_0_OFFSET;
                 command.angle_1 = 0;
                 command.angle_2 = 0;
                 command.angle_3 = 10;
             }
             else if (flag == 1)  // Balance button clicked
             {
+                if(!pidServoX){
+                    pidServoX = new PID("./pid/pidServoX_config");
+                    if (pidServoX->fail())
+                    {
+                        cerr << pidServoX->getErrorStr() << endl;
+                        exit( EXIT_FAILURE );
+                    }
+                }
+                if(!pidServoY){
+                    pidServoY = new PID("./pid/pidServoY_config");
+                    if (pidServoY->fail())
+                    {
+                        cerr << pidServoY->getErrorStr() << endl;
+                        exit( EXIT_FAILURE );
+                    }
+                }
+
+
+                /*even = (even+1)%2;
+                command.angle_0 = even*JUMP + MOTOR_0_OFFSET;
+                command.angle_1 = even*JUMP;
+                command.angle_2 = even*JUMP;
+                command.angle_3 = even*JUMP + 10;*/
                 pidServoX->compute(CENTER_X - posX);
                 pidServoY->compute(CENTER_Y - posY);
 
@@ -186,11 +201,28 @@ void colorTracker::run()
                     command.angle_3 = pidServoX->getOutput();
                 }
 
-                command.angle_0 += 5;
+                command.angle_0 += MOTOR_0_OFFSET;
                 command.angle_3 += 10;
             }
             else if (flag == 2) // Circle button clicked
             {
+                if(!pidServoX){
+                    pidServoX = new PID("./pid/pidServoX_config_circle");
+                    if (pidServoX->fail())
+                    {
+                        cerr << pidServoX->getErrorStr() << endl;
+                        exit( EXIT_FAILURE );
+                    }
+                }
+                if(!pidServoY){
+                    pidServoY = new PID("./pid/pidServoY_config_circle");
+                    if (pidServoY->fail())
+                    {
+                        cerr << pidServoY->getErrorStr() << endl;
+                        exit( EXIT_FAILURE );
+                    }
+                }
+
                 auto end = high_resolution_clock::now();
                 durationSecond = duration_cast<milliseconds>(end - start).count();
 
@@ -215,7 +247,7 @@ void colorTracker::run()
                     command.angle_3 = pidServoX->getOutput();
                 }
 
-                command.angle_0 += 5;
+                command.angle_0 += MOTOR_0_OFFSET;
                 command.angle_3 += 10;
 
                 if(durationSecond-lastSecond > DURATIONPERIOD)
@@ -235,10 +267,10 @@ void colorTracker::run()
                     cerr << pidServoY->getErrorStr() << endl;
                     exit( EXIT_FAILURE );
                 }
+
             }
 
-            /* -------------------- */
-
+            //TODO command send before sleep
             emit dataFromImageProcessing();
 
             if (flag != -1)

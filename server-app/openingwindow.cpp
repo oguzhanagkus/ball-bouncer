@@ -53,17 +53,16 @@ void gWindow::on_controllerConnect_clicked()
     int bytes_read;
 
     bytes_read = 0;
-
     ui->controllerLabel->setText("Connecting...");
     ui->controllerLabel->setStyleSheet(yellowText);
     ui->controllerLabel->repaint();
-
+    qDebug("hello_1");
     if (serialPort.isOpen() == true)
     {
+        qDebug("hello_2");
         controllerConnected = false;
         serialPort.close();
     }
-
     if (serialPort.open(QIODevice::ReadWrite)) // Port opened
     {
         serialPort.write(key, sizeof (key)); // Send key
@@ -86,6 +85,7 @@ void gWindow::on_controllerConnect_clicked()
 
     if (!controllerConnected) // Cannot connect because of (one of) them: port cannot opened, invalid key, timeout
     {
+        qDebug() << serialPort.error();
         serialPort.close();
         ui->controllerLabel->setText("Connection failed!");
         ui->controllerLabel->setStyleSheet(redText);
@@ -135,10 +135,8 @@ void gWindow::on_continueButton_clicked()
     }
 
     serialPort.close();
-
     mainwindow = new MainWindow(nullptr, serialPort.portName(), cameraIndex);
     mainwindow->show();
-
     this->close();
 }
 
