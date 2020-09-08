@@ -66,11 +66,13 @@ void colorTracker::run()
     lastSecond = 0;
 
     /* -------------------- */
+
     // TODO Memory leak
     PID *pidServoX = nullptr;
     PID *pidServoY = nullptr;
 
     /* -------------------- */
+    
     while (true)
     {
         mVideoCap >> mframe;
