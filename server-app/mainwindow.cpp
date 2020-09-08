@@ -7,17 +7,13 @@ MainWindow::MainWindow(QWidget *parent, QString portName, int cameraIndex) : QMa
 {
     ui->setupUi(this);
     this->setWindowTitle("Ball Bouncer - Server");
-    qDebug() << "burda3";
-    initGraphs();
-    qDebug() << "burda4";
-    initSimulation();
-    qDebug() << "burda5";
-    initSerialPort(portName);
-    qDebug() << "burda1";
-    initImageProcessing(cameraIndex);
-    qDebug() << "burd21";
-    connectAllModules();
 
+    initGraphs();
+    initSimulation();
+    initSerialPort(portName);
+    initImageProcessing(cameraIndex);
+
+    connectAllModules();
 }
 
 MainWindow::~MainWindow()
@@ -834,7 +830,6 @@ void MainWindow::connectAllModules()
         if (temp_flag != -1)
         {
             serialPort.write((char *) &temp, sizeof(temp));
-            serialPort.flush();
             giveArmsAngle(temp.angle_0 - 5, temp.angle_1, temp.angle_2, temp.angle_3 - 10);
         }
     });
