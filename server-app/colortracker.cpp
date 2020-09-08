@@ -24,9 +24,8 @@ colorTracker::colorTracker(QObject *parent, int cameraIndex) : QThread {parent} 
 
 void colorTracker::run()
 {
-    qDebug() << "burasiKadikoy";
     mVideoCap = VideoCapture(cameraIndex);
-    qDebug() << "ssdfsd";
+
     if (!mVideoCap.isOpened())
     {
         cout << "Webcam cannot opened!\n";
@@ -44,7 +43,6 @@ void colorTracker::run()
     double dM01, dM10, dArea;
     bool blnFrameReadSuccessfully;
     auto start = high_resolution_clock::now();
-    int even = 0;
 
     /* -------------------- */
 

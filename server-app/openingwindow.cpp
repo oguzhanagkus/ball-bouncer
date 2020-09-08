@@ -56,13 +56,13 @@ void gWindow::on_controllerConnect_clicked()
     ui->controllerLabel->setText("Connecting...");
     ui->controllerLabel->setStyleSheet(yellowText);
     ui->controllerLabel->repaint();
-    qDebug("hello_1");
+
     if (serialPort.isOpen() == true)
     {
-        qDebug("hello_2");
         controllerConnected = false;
         serialPort.close();
     }
+
     if (serialPort.open(QIODevice::ReadWrite)) // Port opened
     {
         serialPort.write(key, sizeof (key)); // Send key
@@ -83,13 +83,22 @@ void gWindow::on_controllerConnect_clicked()
         }
     }
 
-    if (!controllerConnected) // Cannot connect because of (one of) them: port cannot opened, invalid key, timeout
+    if (!controllerConnected) // Cannot connect because of (one of) them: port cannot opened
     {
-        qDebug() << serialPort.error();
-        serialPort.close();
-        ui->controllerLabel->setText("Connection failed!");
-        ui->controllerLabel->setStyleSheet(redText);
-        ui->controllerLabel->repaint();
+        if (serialPort.error() != QSerialPort::NoError) // Connection problem
+        {
+            // qDebug() << serialPort.error();
+            ui->controllerLabel->setText("Error occured!");
+            ui->controllerLabel->setStyleSheet(redText);
+            ui->controllerLabel->repaint();
+        }
+        else // Authentication problem
+        {
+            serialPort.close();
+            ui->controllerLabel->setText("Connection failed!");
+            ui->controllerLabel->setStyleSheet(redText);
+            ui->controllerLabel->repaint();
+        }
     }
 }
 
@@ -109,12 +118,15 @@ void gWindow::on_cameraRefresh_clicked()
     ui->cameraLabel->repaint();
 
     ui->cameraList->clear();
+    cameraNames.clear();
     availableCameras.clear();
     updateAvailableCameraList();
 }
 
 void gWindow::on_cameraConnect_clicked()
 {
+    // No availabilty check, if camera not available, it will exit in new window
+
     ui->cameraLabel->setText("Connected!");
     ui->cameraLabel->setStyleSheet(greenText);
     ui->cameraLabel->repaint();
@@ -155,13 +167,25 @@ void gWindow::updateAvailablePortList()
 {
     availablePorts = QSerialPortInfo::availablePorts();
 
-    for (int i = 0; i < availablePorts.size(); i++)
+    if (availablePorts.size() == 0)
     {
-        portNames.append(availablePorts[i].portName());
-        ui->controllerList->addItem(availablePorts[i].description() + " (" + availablePorts[i].portName() + ")");
-    }
+        ui->controllerLabel->setText("No device detected!");
+        ui->controllerLabel->setStyleSheet(redText);
+        ui->controllerLabel->repaint();
 
-    serialPort.setPortName(portNames[0]);
+        ui->controllerConnect->setEnabled(false);
+    }
+    else
+    {
+        for (int i = 0; i < availablePorts.size(); i++)
+        {
+            portNames.append(availablePorts[i].portName());
+            ui->controllerList->addItem(availablePorts[i].description() + " (" + availablePorts[i].portName() + ")");
+        }
+
+        serialPort.setPortName(portNames[0]);
+        ui->controllerConnect->setEnabled(true);
+    }
 }
 
 void gWindow::updateAvailableCameraList()
@@ -170,20 +194,23 @@ void gWindow::updateAvailableCameraList()
 
     if (availableCameras.size() == 0)
     {
-        ui->cameraLabel->setText("No camera!");
-        ui->controllerLabel->setStyleSheet(redText);
-        ui->controllerLabel->repaint();
+        ui->cameraLabel->setText("No camera detected!");
+        ui->cameraLabel->setStyleSheet(redText);
+        ui->cameraLabel->repaint();
 
-       return;
+        ui->cameraConnect->setEnabled(false);
     }
-
-    for (int i = 0; i < availableCameras.size(); i++)
+    else
     {
-        cameraNames.append(availableCameras[i].deviceName());
-        ui->cameraList->addItem(availableCameras[i].description() + " (" + availableCameras[i].deviceName() + ")");
-    }
+        for (int i = 0; i < availableCameras.size(); i++)
+        {
+            cameraNames.append(availableCameras[i].deviceName());
+            ui->cameraList->addItem(availableCameras[i].description() + " (" + availableCameras[i].deviceName() + ")");
+        }
 
-    setCameraIndex(0);
+        setCameraIndex(0);
+        ui->cameraConnect->setEnabled(true);
+    }
 }
 
 void gWindow::setCameraIndex(int index)

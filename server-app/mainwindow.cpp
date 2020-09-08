@@ -757,20 +757,14 @@ void MainWindow::initGraphs()
 
 void MainWindow::initSimulation()
 {
-    qDebug() << "sesa";
     connect(&tmr, SIGNAL(timeout()), this, SLOT(go()));
-     qDebug() << "sesa2";
     tmr.setInterval(0);
-     qDebug() << "sesa3";
     tmr.start();
-     qDebug() << "sesa4";
 
     robot1 = new Scara(this);
-     qDebug() << "sesa5";
     robot2 = new Scara(this);
     robot3 = new Scara(this);
     robot4 = new Scara(this);
-
 }
 
 void MainWindow::initSerialPort(QString portName)
