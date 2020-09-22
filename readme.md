@@ -55,7 +55,7 @@
 #### Notes:
 - The server and client/mobile applications should be in same local network
 - The server and client applications are compatible with both Linux and Windows because we have developed on QT Platform
-- The mobile applications for only Android systems
+- The mobile application for only Android
 - The detailed report added to repository
 - The project website: https://hamzayogurtcuoglu.github.io/cse396grup11//
 - The project video: https://youtu.be/woOF_tPZMPY
